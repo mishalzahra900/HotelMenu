@@ -50,8 +50,7 @@ public class FoodItemList extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        foodListAdapter = new FoodListAdapter(this, readAllData());
-        recyclerView.setAdapter(foodListAdapter);
+        setAdapter();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -62,12 +61,17 @@ public class FoodItemList extends AppCompatActivity {
         });
     }
 
+    public void setAdapter() {
+        foodList.clear();
+        foodListAdapter = new FoodListAdapter(this, readAllData());
+        recyclerView.setAdapter(foodListAdapter);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        foodListAdapter.notifyDataSetChanged();
+        setAdapter();
     }
-
 
     private ArrayList<FoodModel> readAllData() {
         db = projectDatabase.getReadableDatabase();
@@ -143,8 +147,9 @@ public class FoodItemList extends AppCompatActivity {
                     intent.putExtra("food_name", name);
                     intent.putExtra("food_category", category);
                     intent.putExtra("food_price", price);
-
                     startActivity(intent);
+                    setAdapter();
+
                 }
             });
             holder.delete.setOnClickListener(new View.OnClickListener() {
@@ -160,6 +165,7 @@ public class FoodItemList extends AppCompatActivity {
                             db.delete("FoodItems", "id = ?", new String[]{String.valueOf(id)});
                             Toast.makeText(context, "Item has been deleted", Toast.LENGTH_SHORT).show();
                             dialog.cancel();
+                            setAdapter();
 
                         }
                     });

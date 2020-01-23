@@ -48,7 +48,7 @@ public class Checkout extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
+        setContentView(R.layout.activity_checkout);
 
         recyclerView = findViewById(R.id.recyvlerView);
         projectDatabase = new ProjectDatabase(Checkout.this);
@@ -60,8 +60,7 @@ public class Checkout extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        cartAdapter = new CartAdapter(Checkout.this, readcartList());
-        recyclerView.setAdapter(cartAdapter);
+        setAdapter();
         totalPrice = findViewById(R.id.totalPrice);
         checkout = findViewById(R.id.checkout);
 
@@ -113,6 +112,11 @@ public class Checkout extends AppCompatActivity {
 
         return cartList;
     }
+    public void setAdapter(){
+        cartList.clear();
+        cartAdapter = new CartAdapter(Checkout.this, readcartList());
+        recyclerView.setAdapter(cartAdapter);
+    }
 
     private class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         Context context;
@@ -155,8 +159,7 @@ public class Checkout extends AppCompatActivity {
                 int imageResource = getResources().getIdentifier(uri, null, getPackageName());
                 Drawable res = getResources().getDrawable(imageResource);
                 holder.icon.setImageDrawable(res);
-            }
-            else {
+            } else {
                 holder.icon.setImageResource(R.mipmap.ic_launcher);
 
             }
@@ -166,7 +169,7 @@ public class Checkout extends AppCompatActivity {
                 public void onClick(View v) {
                     db = projectDatabase.getWritableDatabase();
                     db.delete("Cart", "id = ?", new String[]{String.valueOf(id)});
-
+                    setAdapter();
 
                 }
             });
@@ -195,4 +198,5 @@ public class Checkout extends AppCompatActivity {
             }
         }
     }
+
 }

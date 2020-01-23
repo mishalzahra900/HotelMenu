@@ -21,6 +21,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText username, password;
     Button login, register;
     String strUsername, strPassword;
+    ProjectDatabase projectDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,17 +32,14 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         login = findViewById(R.id.btnLogin);
         register = findViewById(R.id.btnRegister);
+        projectDatabase = new ProjectDatabase(LoginActivity.this);
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    ProjectDatabase projectDatabase = new ProjectDatabase(LoginActivity.this);
                     strUsername = username.getText().toString();
                     strPassword = password.getText().toString();
-                    if (strUsername.contains("admin") && strPassword.contains("678")) {
-                        startActivity(new Intent(LoginActivity.this, AdminDashboard.class));
-                    }
                     Log.e(strUsername + " -- ", strPassword);
                     boolean res = projectDatabase.checkUser(strUsername, strPassword);
                     // Log.e("Result", String.valueOf(res));
@@ -50,6 +48,8 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
                         intent.putExtra("Username", strUsername);
                         startActivity(intent);
+                    } else if (strUsername.equals("admin") && strPassword.equals("678")) {
+                        startActivity(new Intent(LoginActivity.this, AdminDashboard.class));
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                         builder.setTitle("Error");

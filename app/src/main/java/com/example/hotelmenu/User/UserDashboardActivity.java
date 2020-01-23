@@ -51,9 +51,14 @@ public class UserDashboardActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        setAdapter();
+
+    }
+
+    public void setAdapter() {
+        categoryList.clear();
         categoriesAdapter = new CategoriesAdapter(UserDashboardActivity.this, readCategories());
         recyclerView.setAdapter(categoriesAdapter);
-
     }
 
     private ArrayList<String> readCategories() {
@@ -76,6 +81,7 @@ public class UserDashboardActivity extends AppCompatActivity {
         return categoryList;
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -183,12 +189,6 @@ public class UserDashboardActivity extends AppCompatActivity {
                 holder.imageView.setImageResource(R.drawable.specialchopsey);
             } else if (categ.equals("Plater")) {
                 holder.imageView.setImageResource(R.drawable.specialchopsey);
-
-
-
-
-
-
 
 
             } else {
