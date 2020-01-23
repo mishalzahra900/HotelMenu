@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gredient"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_horizontal"
+        android:text="Add Food Items"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/category"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:prompt="@string/categories" />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:textColor="@android:color/white"
+        android:hint="Enter Name"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/price"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:hint="Enter Price"
+        android:textColor="@android:color/white"
+        android:inputType="number"
+        android:textSize="20sp" />
+    <EditText
+        android:id="@+id/foodImage"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:hint="Enter Image Name"
+        android:textColor="@android:color/white"
+        android:inputType="text"
+
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/add_item"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/btnshape"
+        android:text="Add"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/update_item"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:text="Update"
+        android:textSize="20sp"
+        android:visibility="gone" />
+
+
+    <Button
+        android:id="@+id/clear"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/btnshape"
+        android:text="Clear"
+        android:textSize="15sp" />
+</LinearLayout>

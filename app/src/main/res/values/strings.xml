@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">HotelMenu</string>
+    <string name="categories">Categories</string>
+
+    <string name="nameError">Enter a Valid Name</string>
+    <string name="usernameError">Enter a Valid UserName</string>
+    <string name="emailError">Enter a valid email</string>
+    <string name="passwordError">Enter a Valid Password</string>
+
+
+</resources>
