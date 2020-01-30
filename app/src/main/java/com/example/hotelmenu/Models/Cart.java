@@ -2,16 +2,8 @@ package com.example.hotelmenu.Models;
 
 public class Cart {
     String img, name, category;
-    double price, qty;
-    int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    double price, subTotal;
+    int id, qty;
 
     public String getImg() {
         return img;
@@ -45,11 +37,27 @@ public class Cart {
         this.price = price;
     }
 
-    public double getQty() {
+    public double getSubTotal() {
+        return subTotal;
+    }
+
+    public void setSubTotal(double subTotal) {
+        this.subTotal = subTotal;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getQty() {
         return qty;
     }
 
-    public void setQty(double qty) {
+    public void setQty(int qty) {
         this.qty = qty;
     }
 }

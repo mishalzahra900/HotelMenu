@@ -24,5 +24,7 @@ public class Constants {
     public static String cart_col_price = "Price";
     public static String cart_col_qty = "Quantity";
     public static String cart_col_image = "Image";
+    public static String cart_col_subTotal = "SubTotal";
+
 
 }

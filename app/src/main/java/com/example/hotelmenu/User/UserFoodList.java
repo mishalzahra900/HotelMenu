@@ -164,7 +164,7 @@ public class UserFoodList extends AppCompatActivity {
                         cart.setQty(1);
                         cart.setImg(image);
 
-                        long res = projectDatabase.insertCart(cart.getName(), cart.getCategory(), cart.getPrice(), cart.getImg());
+                        long res = projectDatabase.insertCart(cart.getName(), cart.getCategory(), cart.getPrice(), cart.getImg(), cart.getQty(), 0.0);
                         if (res > 0) {
                             Toast.makeText(UserFoodList.this, "Food Item Added to your Cart", Toast.LENGTH_SHORT).show();
                         } else {

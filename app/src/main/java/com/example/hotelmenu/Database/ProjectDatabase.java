@@ -15,6 +15,7 @@ import static com.example.hotelmenu.Constants.cart_col_id;
 import static com.example.hotelmenu.Constants.cart_col_image;
 import static com.example.hotelmenu.Constants.cart_col_price;
 import static com.example.hotelmenu.Constants.cart_col_qty;
+import static com.example.hotelmenu.Constants.cart_col_subTotal;
 import static com.example.hotelmenu.Constants.cart_tableName;
 import static com.example.hotelmenu.Constants.databaseName;
 import static com.example.hotelmenu.Constants.food_col_category;
@@ -31,21 +32,6 @@ import static com.example.hotelmenu.Constants.user_col_username;
 import static com.example.hotelmenu.Constants.user_tableName;
 
 public class ProjectDatabase extends SQLiteOpenHelper {
-
-   /* static String databaseName = "Project.db";
-    String tableName = "User";
-    String col_id = "id";
-    String col_fullName = "FullName";
-    String col_email = "Email";
-    String col_username = "Username";
-    String col_password = "Password";
-
-    String food_tableName = "FoodItems";
-    String food_col_id = "id";
-    String food_col_foodName = "FoodName";
-    String food_col_category = "Category";
-    String food_col_price = "Price";
-    String food_col_image = "Image";*/
 
     public ProjectDatabase(Context context) {
         super(context, databaseName, null, 1);
@@ -73,7 +59,8 @@ public class ProjectDatabase extends SQLiteOpenHelper {
                 cart_col_category + " text, " +
                 cart_col_price + " text, " +
                 cart_col_qty + " text, " +
-                cart_col_image + " text)"
+                cart_col_image + " text, " +
+                cart_col_subTotal + " text)"
         );
     }
 
@@ -131,13 +118,16 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         return res;
     }
 
-    public long insertCart(String FoodName, String Category, double Price, String image) {
+    public long insertCart(String FoodName, String Category, double Price, String image, int qty, double subTotal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(cart_col_fName, FoodName);
         contentValues.put(cart_col_category, Category);
         contentValues.put(cart_col_price, Price);
         contentValues.put(cart_col_image, image);
+        contentValues.put(cart_col_qty, qty);
+        contentValues.put(cart_col_subTotal, subTotal);
+
         long res = db.insert(cart_tableName, null, contentValues);
         db.close();
         Log.e("Cart res", String.valueOf(res));
