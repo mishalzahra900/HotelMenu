@@ -4,6 +4,33 @@ public class Cart {
     String img, name, category;
     double price, subTotal;
     int id, qty;
+    String custName, custAddress;
+
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String custName) {
+        this.custName = custName;
+    }
+
+    public String getCustAddress() {
+        return custAddress;
+    }
+
+    public void setCustAddress(String custAddress) {
+        this.custAddress = custAddress;
+    }
+
+    public int getCustPhone() {
+        return custPhone;
+    }
+
+    public void setCustPhone(int custPhone) {
+        this.custPhone = custPhone;
+    }
+
+    int custPhone;
 
     public String getImg() {
         return img;

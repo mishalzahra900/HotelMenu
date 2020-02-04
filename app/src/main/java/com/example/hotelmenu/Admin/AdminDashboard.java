@@ -2,12 +2,17 @@ package com.example.hotelmenu.Admin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hotelmenu.LoginActivity;
+import com.example.hotelmenu.MainActivity;
 import com.example.hotelmenu.R;
+import com.example.hotelmenu.User.Checkout;
 
 public class AdminDashboard extends AppCompatActivity {
 
@@ -34,6 +39,33 @@ public class AdminDashboard extends AppCompatActivity {
                 startActivity(new Intent(AdminDashboard.this, FoodItemList.class));
             }
         });
+        list_order.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(AdminDashboard.this, OrderList.class));
+            }
+        });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.logout_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.logout:
+                startActivity(new Intent(this, MainActivity.class));
+                AdminDashboard.this.finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

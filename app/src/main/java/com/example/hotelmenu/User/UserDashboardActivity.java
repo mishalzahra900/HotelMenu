@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hotelmenu.Database.ProjectDatabase;
+import com.example.hotelmenu.LoginActivity;
+import com.example.hotelmenu.MainActivity;
 import com.example.hotelmenu.R;
 
 import java.util.ArrayList;
@@ -95,6 +97,11 @@ public class UserDashboardActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.checkout:
                 startActivity(new Intent(this, Checkout.class));
+                return true;
+
+            case R.id.userLogout:
+                startActivity(new Intent(this, MainActivity.class));
+                UserDashboardActivity.this.finish();
                 return true;
 
             default:

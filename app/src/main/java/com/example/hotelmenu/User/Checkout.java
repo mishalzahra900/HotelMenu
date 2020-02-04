@@ -67,14 +67,29 @@ public class Checkout extends AppCompatActivity {
         totalPrice = findViewById(R.id.totalPrice);
         checkout = findViewById(R.id.checkout);
 
-        runOnUiThread(new Runnable() {
+        checkout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Checkout.this);
+                builder.setTitle("Confirm Order");
+                builder.setMessage("Click OK to confirm Order");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));
+                    }
+                });
+                builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));
+                        //Truncate the cart Data
+                    }
+                });
+                builder.show();
 
             }
         });
-
-
     }
 
     private ArrayList<Cart> readcartList() {
@@ -119,6 +134,7 @@ public class Checkout extends AppCompatActivity {
             Toast.makeText(Checkout.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
 
         }
+        setAdapter();
     }
 
     public void setAdapter() {
@@ -130,7 +146,10 @@ public class Checkout extends AppCompatActivity {
     private class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         Context context;
         private List<Cart> cartList;
-        int strQty;
+        private int id, qty;
+        double price;
+        String name, category, imageItem;
+
 
         public CartAdapter(Context context, ArrayList<Cart> cartList) {
             this.context = context;
@@ -148,72 +167,21 @@ public class Checkout extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder holder, final int position) {
             holder.itemView.requestLayout();
-            final int id = cartList.get(position).getId();
-            final String name = cartList.get(position).getName();
-            final String category = cartList.get(position).getCategory();
-            final double price = cartList.get(position).getPrice();
-            final int cartQty = cartList.get(position).getQty();
-            final String imageItem = cartList.get(position).getImg();
+            id = cartList.get(position).getId();
+            name = cartList.get(position).getName();
+            category = cartList.get(position).getCategory();
+            price = cartList.get(position).getPrice();
+            qty = cartList.get(position).getQty();
+            imageItem = cartList.get(position).getImg();
             Log.e("Cart Data", imageItem + "-" + name + price);
 
             holder.foodName.setText(name);
             holder.foodCategory.setText(category);
             holder.foodPrice.setText(String.valueOf(price));
 
-            db = projectDatabase.getReadableDatabase();
-            try {
-                Cursor curSubTotal = db.rawQuery("Select " + Constants.cart_col_qty + " * " + Constants.cart_col_price + " as SubTotal From " + Constants.cart_tableName, null);
-                if (curSubTotal.moveToFirst()) {
-                    int SubTotal = curSubTotal.getInt(curSubTotal.getColumnIndex("SubTotal"));
-                    Log.e("SubTotal", String.valueOf(SubTotal));
+            Log.e("cartQty", String.valueOf(qty));
+            //  holder.itemQty.setText(String.valueOf(qty));
 
-                    db = projectDatabase.getWritableDatabase();
-                    ContentValues values = new ContentValues();
-                    values.put(Constants.cart_col_subTotal, SubTotal);
-                    db.update(Constants.cart_tableName, values, "id = ?", new String[]{String.valueOf(id)});
-                    db.close();
-                }
-                curSubTotal.close();
-
-                //db.close();
-            } catch (Exception e) {
-                Log.e("Excep", e.toString());
-            }
-            db = projectDatabase.getReadableDatabase();
-            Cursor cursorTotal = db.rawQuery("SELECT SUM(" + Constants.cart_col_subTotal + ") as Total FROM " + Constants.cart_tableName, null);
-            if (cursorTotal.moveToFirst()) {
-                int total = cursorTotal.getInt(cursorTotal.getColumnIndex("Total"));
-                Log.e("Total", String.valueOf(total));
-                totalPrice.setText("Rs. " + String.valueOf(total));
-            }
-            cursorTotal.close();
-            db.close();
-            /*textWatcher = new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    Log.e("beforeTextChanged", s.toString() + start + after + count);
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    Log.e("Text Changed", s.toString() + start + before + count);
-
-                    holder.edQty.setText(String.valueOf(cartQty));
-                    strQty = Integer.parseInt(holder.edQty.getText().toString());
-
-                    cart.setQty(strQty);
-                    updateCart();
-                    setAdapter();
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    holder.edQty.setText(String.valueOf(cartQty));
-
-                }
-            };*/
-            Log.e("Image", imageItem);
             if (imageItem.length() > 0) {
                 String uri = "@drawable/" + imageItem;
                 Log.e("image", uri);
@@ -224,6 +192,24 @@ public class Checkout extends AppCompatActivity {
                 holder.icon.setImageResource(R.mipmap.ic_launcher);
 
             }
+
+           /* holder.pos.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    qty++;
+                    cart.setQty(qty);
+                }
+            });
+            holder.neg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    qty--;
+                    cart.setQty(qty);
+                }
+            });*/
+            updateCart();
+            calculatePrice();
+            calculateTotal();
 
 
             holder.delete.setOnClickListener(new View.OnClickListener() {
@@ -245,8 +231,8 @@ public class Checkout extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             ImageView icon, delete;
-            TextView foodName, foodPrice, foodCategory;
-            EditText edQty;
+            TextView foodName, foodPrice, foodCategory, itemQty;
+            ImageView pos, neg;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -255,11 +241,48 @@ public class Checkout extends AppCompatActivity {
                 foodPrice = itemView.findViewById(R.id.fPrice);
                 foodCategory = itemView.findViewById(R.id.food_Category);
                 delete = itemView.findViewById(R.id.delItem);
-                edQty = itemView.findViewById(R.id.qty);
-                //edQty.addTextChangedListener(textWatcher);
+                // pos = findViewById(R.id.pos);
+                // neg = findViewById(R.id.neg);
+                // itemQty = findViewById(R.id.textQty);
 
             }
         }
+
+        private void calculateTotal() {
+            db = projectDatabase.getReadableDatabase();
+            Cursor cursorTotal = db.rawQuery("SELECT SUM(" + Constants.cart_col_subTotal + ") as Total FROM " + Constants.cart_tableName, null);
+            if (cursorTotal.moveToFirst()) {
+                int total = cursorTotal.getInt(cursorTotal.getColumnIndex("Total"));
+                Log.e("Total", String.valueOf(total));
+                totalPrice.setText("Rs. " + String.valueOf(total));
+            }
+            cursorTotal.close();
+            db.close();
+        }
+
+        private void calculatePrice() {
+            db = projectDatabase.getReadableDatabase();
+            try {
+                Cursor curSubTotal = db.rawQuery("Select " + Constants.cart_col_qty + " * " + Constants.cart_col_price + " as SubTotal From " + Constants.cart_tableName, null);
+                if (curSubTotal.moveToFirst()) {
+                    int SubTotal = curSubTotal.getInt(curSubTotal.getColumnIndex("SubTotal"));
+                    Log.e("SubTotal", String.valueOf(SubTotal));
+
+                    db = projectDatabase.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    values.put(Constants.cart_col_subTotal, SubTotal);
+                    db.update(Constants.cart_tableName, values, "id = ?", new String[]{String.valueOf(id)});
+                    db.close();
+                }
+                curSubTotal.close();
+
+                //db.close();
+            } catch (Exception e) {
+                Log.e("Excep", e.toString());
+            }
+        }
+
+
     }
 
 }

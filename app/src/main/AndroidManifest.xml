@@ -11,7 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".User.Checkout"></activity>
+        <activity android:name=".Admin.OrderList"></activity>
+        <activity android:name=".User.ConfirmOrder" />
+        <activity android:name=".User.Checkout" />
         <activity android:name=".User.UserFoodList" />
         <activity android:name=".Admin.FoodItemList" />
         <activity android:name=".Admin.AddFood" />

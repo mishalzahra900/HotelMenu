@@ -55,9 +55,10 @@ public class RegisterActivity extends AppCompatActivity {
                         Log.e("Register User", strName + " - " + strEmail + " - " + strUserName + " - " + strPassword);
                         long val = projectDatabase.addUser(strName, strEmail, strUserName, strPassword);
                         if (val > 0) {
-                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                             startActivity(intent);
                             Toast.makeText(RegisterActivity.this, "Registered", Toast.LENGTH_SHORT).show();
+                            RegisterActivity.this.finish();
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
                             builder.setTitle("Error");
@@ -91,6 +92,8 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                RegisterActivity.this.finish();
+
 
             }
         });
