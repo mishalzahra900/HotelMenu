@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:background="@drawable/gredient"
     app:cardCornerRadius="10dp"
     app:cardElevation="5dp">
 
@@ -76,41 +75,41 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_marginRight="10dp"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
 
                     <ImageView
-                        android:id="@+id/pos"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/negQty"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:src="@android:drawable/btn_minus" />
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:src="@drawable/minus" />
 
 
                     <TextView
                         android:id="@+id/textQty"
-                        android:layout_width="30dp"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center"
-                        android:text="1"
-                        android:textSize="25sp" />
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:text="10" />
 
                     <ImageView
-                        android:id="@+id/neg"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/posQty"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:src="@android:drawable/btn_plus" />
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:src="@drawable/plus" />
 
 
                 </LinearLayout>
-                <!-- <EditText
-                     android:id="@+id/qty"
-                     android:layout_width="30dp"
-                     android:layout_height="50dp"
-                     android:gravity="center_vertical"
-                     android:layout_margin="5dp"
-                     android:textSize="14sp"
-                     android:inputType="number"
-                     android:hint="1"/>-->
 
                 <ImageView
                     android:id="@+id/delItem"
