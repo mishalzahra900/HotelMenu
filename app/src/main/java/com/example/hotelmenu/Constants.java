@@ -26,6 +26,9 @@ public class Constants {
     public static String cart_col_image = "Image";
     public static String cart_col_subTotal = "SubTotal";
 
+    public static String order_tableName = "Orders";
+    public static String order_custName = "CustNdame";
+
 
 
 }

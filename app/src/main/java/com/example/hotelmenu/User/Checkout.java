@@ -19,6 +19,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +34,7 @@ import com.example.hotelmenu.Admin.AddFood;
 import com.example.hotelmenu.Admin.FoodItemList;
 import com.example.hotelmenu.Constants;
 import com.example.hotelmenu.Database.ProjectDatabase;
+import com.example.hotelmenu.MainActivity;
 import com.example.hotelmenu.Models.Cart;
 import com.example.hotelmenu.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -77,8 +80,38 @@ public class Checkout extends AppCompatActivity {
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));
+                        db = projectDatabase.getReadableDatabase();
+                        Cursor cursor = db.rawQuery("Select id, Name, Category, Price, Image, Quantity From Cart", new String[]{});
+
+                        if (cursor.moveToFirst()) {
+                            do {
+                                int id = cursor.getInt(0);
+                                String Name = cursor.getString(1);
+                                String Category = cursor.getString(2);
+                                double Price = cursor.getDouble(3);
+                                String Image = cursor.getString(4);
+                                int Quantity = cursor.getInt(5);
+
+                                long res = projectDatabase.confirmOrder(Name, Category, Price, Image, Quantity, UserDashboardActivity.user);
+                                Log.e("App Confirm", String.valueOf(res));
+                                Log.e("App Name", Name);
+
+                                db = projectDatabase.getWritableDatabase();
+                                db.execSQL("delete from " + Constants.cart_tableName);
+                                db.close();
+
+
+                            } while (cursor.moveToNext());
+                        }
+
+                        cursor.close();
+
                         Toast.makeText(Checkout.this, "Your Order is Confirmed", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));
+                        Checkout.this.finish();
+                /*        projectDatabase.confirmOrder();
+                        Toast.makeText(Checkout.this, "Order has been Confirmed", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));*/
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -100,6 +133,31 @@ public class Checkout extends AppCompatActivity {
         cartList.clear();
         cartAdapter = new CartAdapter(Checkout.this, readcartList());
         recyclerView.setAdapter(cartAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.checkout_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.checkout:
+                startActivity(new Intent(this, Checkout.class));
+                return true;
+
+            case R.id.userLogout:
+                startActivity(new Intent(this, MainActivity.class));
+                Checkout.this.finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private ArrayList<Cart> readcartList() {
@@ -139,7 +197,7 @@ public class Checkout extends AppCompatActivity {
     private class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         Context context;
         private List<Cart> cartList;
-        private int id, qty;
+        private int cartId, qty;
         double price;
         String name, category, imageItem;
 
@@ -160,7 +218,7 @@ public class Checkout extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
             holder.itemView.requestLayout();
-            id = cartList.get(position).getId();
+            cartId = cartList.get(position).getId();
             name = cartList.get(position).getName();
             category = cartList.get(position).getCategory();
             price = cartList.get(position).getPrice();
@@ -170,28 +228,29 @@ public class Checkout extends AppCompatActivity {
 
             holder.foodName.setText(name);
             holder.foodCategory.setText(category);
-            holder.foodPrice.setText(String.valueOf(price));
+            holder.foodPrice.setText("Rs. " + String.valueOf(price));
 
             Log.e("cartQty", String.valueOf(qty));
-            calculatePrice(id);
+
             calculateTotal();
             holder.numberBtn.setNumber(String.valueOf(qty));
             holder.numberBtn.setOnValueChangeListener(new ElegantNumberButton.OnValueChangeListener() {
                 @Override
                 public void onValueChange(ElegantNumberButton view, int oldValue, int newValue) {
-//                    Log.e("Value", String.valueOf(oldValue + " - " + newValue));
-                    qty = newValue;
-                  //  cart.setQty(qty);
-                    updateCart(id, qty);
+                    cart = cartList.get(position);
+                    cartId = cartList.get(position).getId();
+                    cart.setQty(newValue);
+                    updateCart();
+
+                    Log.e("Pos", String.valueOf(position) + "--" + cartId);
                 }
             });
-
             holder.delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     db = projectDatabase.getWritableDatabase();
-                    db.delete(Constants.cart_tableName, "id = ?", new String[]{String.valueOf(id)});
-                    calculatePrice(id);
+                    db.delete(Constants.cart_tableName, "id = ?", new String[]{String.valueOf(cartId)});
+
                     calculateTotal();
                     notifyDataSetChanged();
                     setAdapter();
@@ -208,7 +267,7 @@ public class Checkout extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             ImageView icon, delete;
-            TextView foodName, foodPrice, foodCategory;
+            TextView foodName, foodPrice, foodCategory, itemQtyText;
             // ImageView pos, neg;
             public ElegantNumberButton numberBtn;
 
@@ -221,26 +280,25 @@ public class Checkout extends AppCompatActivity {
                 foodCategory = itemView.findViewById(R.id.food_Category);
                 delete = itemView.findViewById(R.id.delItem);
                 numberBtn = itemView.findViewById(R.id.number_button);
-                //pos = itemView.findViewById(R.id.posQty);
-                //neg = itemView.findViewById(R.id.negQty);
-                //itemQtyText = itemView.findViewById(R.id.textQty);
+
 
             }
         }
 
         private void calculateTotal() {
             db = projectDatabase.getReadableDatabase();
-            Cursor cursorTotal = db.rawQuery("SELECT SUM(" + Constants.cart_col_subTotal + ") as Total FROM " + Constants.cart_tableName, null);
+            Cursor cursorTotal = db.rawQuery("SELECT SUM(" + Constants.cart_col_qty + " * " + Constants.cart_col_price + ") as Total FROM " + Constants.cart_tableName, null);
             if (cursorTotal.moveToFirst()) {
-                total = cursorTotal.getInt(cursorTotal.getColumnIndex("Total"));
-                Log.e("Total", String.valueOf(total));
-                totalPrice.setText("Rs. " + String.valueOf(total));
+                int total = cursorTotal.getInt(cursorTotal.getColumnIndex("Total"));
+                // Log.e("Total", String.valueOf(total));
+                totalPrice.setText("Rs. " + total);
             }
             cursorTotal.close();
             db.close();
         }
 
-        private void calculatePrice(int newId) {
+
+      /*  private void calculatePrice(int newId) {
             db = projectDatabase.getReadableDatabase();
             try {
                 Cursor curSubTotal = db.rawQuery("Select " + Constants.cart_col_qty + " * " + Constants.cart_col_price +
@@ -261,25 +319,23 @@ public class Checkout extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e("Excep", e.toString());
             }
-        }
+        }*/
 
-        private void updateCart(int id, int qty) {
+        private void updateCart() {
             db = projectDatabase.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(Constants.cart_col_id, id);
-            //values.put(Constants.cart_col_fName, cart.getName());
-            //values.put(Constants.cart_col_category, cart.getCategory());
-            //values.put(Constants.cart_col_price, cart.getPrice());
-            values.put(Constants.cart_col_qty, qty);
-            //values.put(Constants.cart_col_subTotal, cart.getSubTotal());
-
-            db.update(Constants.cart_tableName, values, "id = ?", new String[]{String.valueOf(id)});
-            db.close();
-            calculatePrice(id);
+            values.put(Constants.cart_col_qty, cart.getQty());
+            try {
+                String query = String.format("UPDATE Cart SET Quantity= %s WHERE id = %d", cart.getQty(), cart.getId());
+                db.execSQL(query);
+                db.close();
+            } catch (Exception e) {
+                Log.e("Qu Exce", e.toString());
+            }
+            //db.update(Constants.cart_tableName, values, "id = ?", new String[]{String.valueOf(id)});
             calculateTotal();
             notifyDataSetChanged();
             setAdapter();
-
         }
 
 

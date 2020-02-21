@@ -24,6 +24,8 @@ import static com.example.hotelmenu.Constants.food_col_id;
 import static com.example.hotelmenu.Constants.food_col_image;
 import static com.example.hotelmenu.Constants.food_col_price;
 import static com.example.hotelmenu.Constants.food_tableName;
+import static com.example.hotelmenu.Constants.order_custName;
+import static com.example.hotelmenu.Constants.order_tableName;
 import static com.example.hotelmenu.Constants.user_col_email;
 import static com.example.hotelmenu.Constants.user_col_fullName;
 import static com.example.hotelmenu.Constants.user_col_id;
@@ -61,6 +63,16 @@ public class ProjectDatabase extends SQLiteOpenHelper {
                 cart_col_qty + " text, " +
                 cart_col_image + " text, " +
                 cart_col_subTotal + " text)"
+        );
+
+        db.execSQL("create table " + order_tableName + "(" +
+                cart_col_id + " integer primary key autoincrement, " +
+                cart_col_fName + " text, " +
+                cart_col_category + " text, " +
+                cart_col_price + " text, " +
+                cart_col_image + " text, " +
+                cart_col_qty + " text, " +
+                order_custName + " text)"
         );
     }
 
@@ -129,6 +141,21 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         contentValues.put(cart_col_subTotal, subTotal);
 
         long res = db.insert(cart_tableName, null, contentValues);
+        db.close();
+        Log.e("Cart res", String.valueOf(res));
+        return res;
+    }
+
+    public long confirmOrder(String FoodName, String Category, double Price, String image, int qty, String CustName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(cart_col_fName, FoodName);
+        contentValues.put(cart_col_category, Category);
+        contentValues.put(cart_col_price, Price);
+        contentValues.put(cart_col_image, image);
+        contentValues.put(cart_col_qty, qty);
+        contentValues.put(order_custName, CustName);
+        long res = db.insert(order_tableName, null, contentValues);
         db.close();
         Log.e("Cart res", String.valueOf(res));
         return res;

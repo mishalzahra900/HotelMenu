@@ -36,6 +36,7 @@ public class UserDashboardActivity extends AppCompatActivity {
     ProjectDatabase projectDatabase;
     SQLiteDatabase db;
     ArrayList<String> categoryList;
+    public static String user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class UserDashboardActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyvlerView);
 
         textView = findViewById(R.id.usernameText);
-        String user = getIntent().getStringExtra("Username");
+        user = getIntent().getStringExtra("Username");
         textView.setText("Welcome\n" + user);
         projectDatabase = new ProjectDatabase(UserDashboardActivity.this);
         categoryList = new ArrayList<>();
