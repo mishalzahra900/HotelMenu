@@ -7,8 +7,5 @@
         android:title="Checkout"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/userLogout"
-        android:title="Logout"
-        app:showAsAction="never" />
+   
 </menu>

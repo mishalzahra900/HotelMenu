@@ -4,9 +4,17 @@ public class OrderModel {
 
     String img, name, category;
     double price;
-    int id;
+    int id, tableNo;
     int qty;
     String CustName;
+
+    public int getTableNo() {
+        return tableNo;
+    }
+
+    public void setTableNo(int tableNo) {
+        this.tableNo = tableNo;
+    }
 
     public String getCustName() {
         return CustName;

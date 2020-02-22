@@ -19,7 +19,7 @@ import com.example.hotelmenu.User.UserDashboardActivity;
 public class LoginActivity extends AppCompatActivity {
 
     EditText username, password;
-    Button login, register;
+    Button login;
     String strUsername, strPassword;
     ProjectDatabase projectDatabase;
 
@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
         login = findViewById(R.id.btnLogin);
-        register = findViewById(R.id.btnRegister);
+        // register = findViewById(R.id.btnRegister);
         projectDatabase = new ProjectDatabase(LoginActivity.this);
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -41,7 +41,12 @@ public class LoginActivity extends AppCompatActivity {
                     strUsername = username.getText().toString();
                     strPassword = password.getText().toString();
                     Log.e(strUsername + " -- ", strPassword);
-                    boolean res = projectDatabase.checkUser(strUsername, strPassword);
+                    if (strUsername.equals("admin") && strPassword.equals("678")) {
+                        startActivity(new Intent(LoginActivity.this, AdminDashboard.class));
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Enter Values", Toast.LENGTH_SHORT).show();
+
+                    }                   /* boolean res = projectDatabase.checkUser(strUsername, strPassword);
                     // Log.e("Result", String.valueOf(res));
                     if (res) {
                         Toast.makeText(LoginActivity.this, "Successfully Login", Toast.LENGTH_SHORT).show();
@@ -61,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         });
                         builder.show();
-                    }
+                    }*/
 
 
                 } catch (Exception e) {
@@ -81,14 +86,14 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-        register.setOnClickListener(new View.OnClickListener() {
+     /*   register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }
         });
-
+*/
 
     }
 }

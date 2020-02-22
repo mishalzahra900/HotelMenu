@@ -15,8 +15,9 @@ import static com.example.hotelmenu.Constants.cart_col_id;
 import static com.example.hotelmenu.Constants.cart_col_image;
 import static com.example.hotelmenu.Constants.cart_col_price;
 import static com.example.hotelmenu.Constants.cart_col_qty;
-import static com.example.hotelmenu.Constants.cart_col_subTotal;
 import static com.example.hotelmenu.Constants.cart_tableName;
+import static com.example.hotelmenu.Constants.col_tableNO;
+import static com.example.hotelmenu.Constants.col_userName;
 import static com.example.hotelmenu.Constants.databaseName;
 import static com.example.hotelmenu.Constants.food_col_category;
 import static com.example.hotelmenu.Constants.food_col_foodName;
@@ -24,14 +25,7 @@ import static com.example.hotelmenu.Constants.food_col_id;
 import static com.example.hotelmenu.Constants.food_col_image;
 import static com.example.hotelmenu.Constants.food_col_price;
 import static com.example.hotelmenu.Constants.food_tableName;
-import static com.example.hotelmenu.Constants.order_custName;
 import static com.example.hotelmenu.Constants.order_tableName;
-import static com.example.hotelmenu.Constants.user_col_email;
-import static com.example.hotelmenu.Constants.user_col_fullName;
-import static com.example.hotelmenu.Constants.user_col_id;
-import static com.example.hotelmenu.Constants.user_col_password;
-import static com.example.hotelmenu.Constants.user_col_username;
-import static com.example.hotelmenu.Constants.user_tableName;
 
 public class ProjectDatabase extends SQLiteOpenHelper {
 
@@ -41,13 +35,13 @@ public class ProjectDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + Constants.user_tableName + "(" +
+      /*  db.execSQL("create table " + Constants.user_tableName + "(" +
                 user_col_id + " integer primary key autoincrement, " +
                 user_col_fullName + " text, " +
                 user_col_email + " text, " +
                 user_col_username + " text, " +
                 user_col_password + " text)"
-        );
+        );*/
         db.execSQL("create table " + food_tableName + "(" +
                 food_col_id + " integer primary key autoincrement, " +
                 food_col_foodName + " text, " +
@@ -61,8 +55,7 @@ public class ProjectDatabase extends SQLiteOpenHelper {
                 cart_col_category + " text, " +
                 cart_col_price + " text, " +
                 cart_col_qty + " text, " +
-                cart_col_image + " text, " +
-                cart_col_subTotal + " text)"
+                cart_col_image + " text)"
         );
 
         db.execSQL("create table " + order_tableName + "(" +
@@ -72,7 +65,8 @@ public class ProjectDatabase extends SQLiteOpenHelper {
                 cart_col_price + " text, " +
                 cart_col_image + " text, " +
                 cart_col_qty + " text, " +
-                order_custName + " text)"
+                col_userName + " text, " +
+                col_tableNO + " text)"
         );
     }
 
@@ -85,7 +79,7 @@ public class ProjectDatabase extends SQLiteOpenHelper {
 
     }
 
-    //    start Login or Register
+ /*   //    start Login or Register
     public long addUser(String fullName, String email, String userName, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -97,9 +91,9 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         db.close();
         Log.e("addUser res", String.valueOf(res));
         return res;
-    }
+    }*/
 
-    public boolean checkUser(String user, String pass) {
+  /*  public boolean checkUser(String user, String pass) {
         String[] column = {user_col_id};
         SQLiteDatabase db = getReadableDatabase();
         String selection = user_col_username + "=?" + " and " + user_col_password + "=?";
@@ -114,7 +108,7 @@ public class ProjectDatabase extends SQLiteOpenHelper {
             return true;
         } else
             return false;
-    }
+    }*/
 
     public long addFood(String FoodName, String Category, double Price, String image) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -130,7 +124,7 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         return res;
     }
 
-    public long insertCart(String FoodName, String Category, double Price, String image, int qty, double subTotal) {
+    public long insertCart(String FoodName, String Category, double Price, String image, int qty) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(cart_col_fName, FoodName);
@@ -138,7 +132,6 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         contentValues.put(cart_col_price, Price);
         contentValues.put(cart_col_image, image);
         contentValues.put(cart_col_qty, qty);
-        contentValues.put(cart_col_subTotal, subTotal);
 
         long res = db.insert(cart_tableName, null, contentValues);
         db.close();
@@ -146,7 +139,7 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         return res;
     }
 
-    public long confirmOrder(String FoodName, String Category, double Price, String image, int qty, String CustName) {
+    public long confirmOrder(String FoodName, String Category, double Price, String image, int qty, String CustName, int tableNo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(cart_col_fName, FoodName);
@@ -154,7 +147,9 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         contentValues.put(cart_col_price, Price);
         contentValues.put(cart_col_image, image);
         contentValues.put(cart_col_qty, qty);
-        contentValues.put(order_custName, CustName);
+        contentValues.put(col_userName, CustName);
+        contentValues.put(col_tableNO, tableNo);
+
         long res = db.insert(order_tableName, null, contentValues);
         db.close();
         Log.e("Cart res", String.valueOf(res));

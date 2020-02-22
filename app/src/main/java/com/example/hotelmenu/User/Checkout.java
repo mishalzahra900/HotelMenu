@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -51,7 +52,6 @@ public class Checkout extends AppCompatActivity {
     Cart cart;
     TextView totalPrice;
     Button checkout;
-    int SubTotal, total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,44 +74,68 @@ public class Checkout extends AppCompatActivity {
         checkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(Checkout.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(Checkout.this);
                 builder.setTitle("Confirm Order");
                 builder.setMessage("Click OK to confirm Order");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db = projectDatabase.getReadableDatabase();
-                        Cursor cursor = db.rawQuery("Select id, Name, Category, Price, Image, Quantity From Cart", new String[]{});
 
-                        if (cursor.moveToFirst()) {
-                            do {
-                                int id = cursor.getInt(0);
-                                String Name = cursor.getString(1);
-                                String Category = cursor.getString(2);
-                                double Price = cursor.getDouble(3);
-                                String Image = cursor.getString(4);
-                                int Quantity = cursor.getInt(5);
+                        final Dialog customDialog = new Dialog(Checkout.this);
+                        customDialog.setContentView(R.layout.activity_confirm_order);
+                        customDialog.setCancelable(true);
+                        customDialog.setTitle("Confirm Order...");
 
-                                long res = projectDatabase.confirmOrder(Name, Category, Price, Image, Quantity, UserDashboardActivity.user);
-                                Log.e("App Confirm", String.valueOf(res));
-                                Log.e("App Name", Name);
+                        Button confirm = (Button) customDialog.findViewById(R.id.confirmOrder);
+                        Button cancel = (Button) customDialog.findViewById(R.id.cancel);
+                        final EditText name = customDialog.findViewById(R.id.custName);
+                        final EditText tableNo = customDialog.findViewById(R.id.tableNo);
+                        // if button is clicked, close the custom dialog
+                        cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                customDialog.cancel();
+                            }
+                        });
+                        confirm.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String nameStr = name.getText().toString();
+                                int tableNoStr = Integer.parseInt(tableNo.getText().toString());
+                                db = projectDatabase.getReadableDatabase();
+                                Cursor cursor = db.rawQuery("Select id, Name, Category, Price, Image, Quantity From Cart", new String[]{});
 
-                                db = projectDatabase.getWritableDatabase();
-                                db.execSQL("delete from " + Constants.cart_tableName);
-                                db.close();
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        int id = cursor.getInt(0);
+                                        String Name = cursor.getString(1);
+                                        String Category = cursor.getString(2);
+                                        double Price = cursor.getDouble(3);
+                                        String Image = cursor.getString(4);
+                                        int Quantity = cursor.getInt(5);
+
+                                        long res = projectDatabase.confirmOrder(Name, Category, Price, Image, Quantity, nameStr, tableNoStr);
+                                        Log.e("App Confirm", String.valueOf(res));
+                                        //Log.e("App Name", Name);
+
+                                        db = projectDatabase.getWritableDatabase();
+                                        db.execSQL("delete from " + Constants.cart_tableName);
+                                        db.close();
+                                        Toast.makeText(Checkout.this, "Your Order is Confirmed", Toast.LENGTH_LONG).show();
+                                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));
+                                        Checkout.this.finish();
+                                        customDialog.cancel();
+
+                                    } while (cursor.moveToNext());
+                                }
+
+                                cursor.close();
+                            }
+                        });
+
+                        customDialog.show();
 
 
-                            } while (cursor.moveToNext());
-                        }
-
-                        cursor.close();
-
-                        Toast.makeText(Checkout.this, "Your Order is Confirmed", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));
-                        Checkout.this.finish();
-                /*        projectDatabase.confirmOrder();
-                        Toast.makeText(Checkout.this, "Order has been Confirmed", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(Checkout.this, UserDashboardActivity.class));*/
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -121,6 +145,7 @@ public class Checkout extends AppCompatActivity {
                         db = projectDatabase.getWritableDatabase();
                         db.execSQL("delete from " + Constants.cart_tableName);
                         db.close();
+
                     }
                 });
                 builder.show();
@@ -150,10 +175,6 @@ public class Checkout extends AppCompatActivity {
                 startActivity(new Intent(this, Checkout.class));
                 return true;
 
-            case R.id.userLogout:
-                startActivity(new Intent(this, MainActivity.class));
-                Checkout.this.finish();
-                return true;
 
             default:
                 return super.onOptionsItemSelected(item);

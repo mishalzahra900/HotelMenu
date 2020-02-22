@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.hotelmenu.Database.ProjectDatabase;
 import com.example.hotelmenu.LoginActivity;
@@ -36,7 +37,7 @@ public class UserDashboardActivity extends AppCompatActivity {
     ProjectDatabase projectDatabase;
     SQLiteDatabase db;
     ArrayList<String> categoryList;
-    public static String user;
+   // public static String user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +45,16 @@ public class UserDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
         recyclerView = findViewById(R.id.recyvlerView);
 
-        textView = findViewById(R.id.usernameText);
-        user = getIntent().getStringExtra("Username");
-        textView.setText("Welcome\n" + user);
+      //  textView = findViewById(R.id.usernameText);
+      //  user = getIntent().getStringExtra("Username");
+      //  textView.setText("Welcome\n" + user);
         projectDatabase = new ProjectDatabase(UserDashboardActivity.this);
         categoryList = new ArrayList<>();
 
         recyclerView = findViewById(R.id.recyvlerView);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
+//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         setAdapter();
 
@@ -100,11 +102,11 @@ public class UserDashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, Checkout.class));
                 return true;
 
-            case R.id.userLogout:
+         /*   case R.id.userLogout:
                 startActivity(new Intent(this, MainActivity.class));
                 UserDashboardActivity.this.finish();
                 return true;
-
+*/
             default:
                 return super.onOptionsItemSelected(item);
         }

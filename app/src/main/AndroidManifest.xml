@@ -11,7 +11,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Admin.OrderList"></activity>
+        <activity
+            android:name=".Splash"
+            android:theme="@style/NOActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Admin.OrderList" />
         <activity android:name=".User.ConfirmOrder" />
         <activity android:name=".User.Checkout" />
         <activity android:name=".User.UserFoodList" />
@@ -19,15 +28,21 @@
         <activity android:name=".Admin.AddFood" />
         <activity android:name=".Admin.AdminDashboard" />
         <activity android:name=".OrderActivty" />
-        <activity android:name=".User.UserDashboardActivity" />
+        <activity android:name=".User.UserDashboardActivity">
+
+        </activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".LoginActivity"
+            android:icon="@drawable/manager">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity">
+
         </activity>
     </application>
 

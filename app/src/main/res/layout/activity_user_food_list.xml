@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     app:cardCornerRadius="10dp"
-    android:background="@drawable/gredient"
     app:cardElevation="5dp">
 
     <LinearLayout
@@ -18,8 +16,9 @@
 
         <ImageView
             android:id="@+id/imageFood"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
             android:src="@mipmap/ic_launcher" />
 
         <LinearLayout
@@ -57,9 +56,9 @@
                 <ImageView
                     android:id="@+id/cart"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
-                    android:src="@drawable/cart"
+                    android:src="@drawable/ic_add_box_black_24dp"
                     android:tint="@color/colorPrimary" />
             </LinearLayout>
 

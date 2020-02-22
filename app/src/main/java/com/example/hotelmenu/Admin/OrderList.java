@@ -78,8 +78,8 @@ public class OrderList extends AppCompatActivity {
     private ArrayList<OrderModel> readAllData() {
         db = projectDatabase.getReadableDatabase();
         Cursor cursor = db.rawQuery("Select " + Constants.cart_col_id + ", " + Constants.cart_col_fName + ", " + Constants.cart_col_category
-                + ", " + Constants.cart_col_price + ", " + Constants.cart_col_image +
-                ", " + Constants.cart_col_qty + ", " + Constants.order_custName + " From " + Constants.order_tableName, new String[]{});
+                + ", " + Constants.cart_col_price + ", " + Constants.cart_col_image + ", " + Constants.cart_col_qty + ", "
+                + Constants.col_userName + ", " + Constants.col_tableNO + " From " + Constants.order_tableName, new String[]{});
 
         if (cursor.moveToFirst()) {
             do {
@@ -90,6 +90,7 @@ public class OrderList extends AppCompatActivity {
                 String Image = cursor.getString(4);
                 int quan = cursor.getInt(5);
                 String custName = cursor.getString(6);
+                int tableNo = cursor.getInt(7);
 
                 orderModel = new OrderModel();
                 orderModel.setId(id);
@@ -99,6 +100,7 @@ public class OrderList extends AppCompatActivity {
                 orderModel.setImg(Image);
                 orderModel.setQty(quan);
                 orderModel.setCustName(custName);
+                orderModel.setTableNo(tableNo);
                 orderLists.add(orderModel);
             } while (cursor.moveToNext());
         }
@@ -121,7 +123,7 @@ public class OrderList extends AppCompatActivity {
         @NonNull
         @Override
         public OrderListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(context).inflate(R.layout.food_listitems, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.admin_orderlistitem, parent, false);
 
             return new OrderListAdapter.ViewHolder(view);
         }
@@ -135,11 +137,13 @@ public class OrderList extends AppCompatActivity {
             final double price = orderModelList.get(position).getPrice();
             final String imageFood = orderModelList.get(position).getImg();
             final String custName = orderModelList.get(position).getCustName();
+            final int table = orderModelList.get(position).getTableNo();
             Log.e("Data", imageFood + "-" + name + price);
 
             holder.foodName.setText(name);
             holder.custName.setText(custName);
             holder.foodCategory.setText(category);
+            holder.tableNo.setText("Table No: " + table);
             holder.foodPrice.setText("Rs. " + String.valueOf(price));
 
             if (imageFood.length() > 0) {
@@ -161,7 +165,7 @@ public class OrderList extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             db = projectDatabase.getWritableDatabase();
-                            db.delete("FoodItems", "id = ?", new String[]{String.valueOf(id)});
+                            db.delete(Constants.order_tableName, "id = ?", new String[]{String.valueOf(id)});
                             Toast.makeText(context, "Item has been deleted", Toast.LENGTH_SHORT).show();
                             dialog.cancel();
                             setAdapter();
@@ -188,7 +192,7 @@ public class OrderList extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             ImageView icon, delete, edit;
-            TextView foodName, foodPrice, foodCategory, custName;
+            TextView foodName, foodPrice, foodCategory, custName, tableNo;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -199,6 +203,7 @@ public class OrderList extends AppCompatActivity {
                 delete = itemView.findViewById(R.id.delItem);
                 edit = itemView.findViewById(R.id.editItem);
                 custName = itemView.findViewById(R.id.custName);
+                tableNo = itemView.findViewById(R.id.tablNoo);
 
             }
         }
