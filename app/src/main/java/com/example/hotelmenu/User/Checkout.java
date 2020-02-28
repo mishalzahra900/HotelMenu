@@ -251,6 +251,15 @@ public class Checkout extends AppCompatActivity {
             holder.foodCategory.setText(category);
             holder.foodPrice.setText("Rs. " + String.valueOf(price));
 
+            if (imageItem.length() > 0) {
+                String uri = "@drawable/" + cartList.get(position).getImg();
+                int imageResource = getResources().getIdentifier(uri, null, getPackageName());
+                Drawable res = getResources().getDrawable(imageResource);
+                holder.icon.setImageDrawable(res);
+            } else {
+                holder.icon.setImageResource(R.mipmap.ic_launcher);
+
+            }
             Log.e("cartQty", String.valueOf(qty));
 
             calculateTotal();
@@ -311,7 +320,7 @@ public class Checkout extends AppCompatActivity {
             Cursor cursorTotal = db.rawQuery("SELECT SUM(" + Constants.cart_col_qty + " * " + Constants.cart_col_price + ") as Total FROM " + Constants.cart_tableName, null);
             if (cursorTotal.moveToFirst()) {
                 int total = cursorTotal.getInt(cursorTotal.getColumnIndex("Total"));
-                // Log.e("Total", String.valueOf(total));
+//                Log.e("Total", String.valueOf(total));
                 totalPrice.setText("Rs. " + total);
             }
             cursorTotal.close();

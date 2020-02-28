@@ -9,6 +9,15 @@ import android.util.Log;
 
 import com.example.hotelmenu.Constants;
 
+import static com.example.hotelmenu.Constants.adminOrder_col_category;
+import static com.example.hotelmenu.Constants.adminOrder_col_fName;
+import static com.example.hotelmenu.Constants.adminOrder_col_id;
+import static com.example.hotelmenu.Constants.adminOrder_col_image;
+import static com.example.hotelmenu.Constants.adminOrder_col_price;
+import static com.example.hotelmenu.Constants.adminOrder_col_qty;
+import static com.example.hotelmenu.Constants.adminOrder_tableNO;
+import static com.example.hotelmenu.Constants.adminOrder_tableName;
+import static com.example.hotelmenu.Constants.adminOrder_userName;
 import static com.example.hotelmenu.Constants.cart_col_category;
 import static com.example.hotelmenu.Constants.cart_col_fName;
 import static com.example.hotelmenu.Constants.cart_col_id;
@@ -67,6 +76,17 @@ public class ProjectDatabase extends SQLiteOpenHelper {
                 cart_col_qty + " text, " +
                 col_userName + " text, " +
                 col_tableNO + " text)"
+        );
+
+        db.execSQL("create table " + adminOrder_tableName + "(" +
+                adminOrder_col_id + " integer primary key autoincrement, " +
+                adminOrder_col_fName + " text, " +
+                adminOrder_col_category + " text, " +
+                adminOrder_col_price + " text, " +
+                adminOrder_col_image + " text, " +
+                adminOrder_col_qty + " text, " +
+                adminOrder_userName + " text, " +
+                adminOrder_tableNO + " text)"
         );
     }
 
@@ -151,6 +171,24 @@ public class ProjectDatabase extends SQLiteOpenHelper {
         contentValues.put(col_tableNO, tableNo);
 
         long res = db.insert(order_tableName, null, contentValues);
+        db.close();
+        Log.e("Cart res", String.valueOf(res));
+        return res;
+    }
+
+
+    public long insertAdminOrder(String FoodName, String Category, double Price, String image, int qty, String CustName, int TableNO) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(adminOrder_col_fName, FoodName);
+        contentValues.put(adminOrder_col_category, Category);
+        contentValues.put(adminOrder_col_price, Price);
+        contentValues.put(adminOrder_col_image, image);
+        contentValues.put(adminOrder_col_qty, qty);
+        contentValues.put(adminOrder_userName, CustName);
+        contentValues.put(adminOrder_tableNO, TableNO);
+
+        long res = db.insert(adminOrder_tableName, null, contentValues);
         db.close();
         Log.e("Cart res", String.valueOf(res));
         return res;

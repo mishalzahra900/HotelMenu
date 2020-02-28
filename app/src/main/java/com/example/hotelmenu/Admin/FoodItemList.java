@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
@@ -136,8 +137,13 @@ public class FoodItemList extends AppCompatActivity {
                 String uri = "@drawable/" + imageFood;
                 Log.e("image", uri);
                 int imageResource = getResources().getIdentifier(uri, null, getPackageName());
-                Drawable res = getResources().getDrawable(imageResource);
-                holder.icon.setImageDrawable(res);
+                try {
+                    Drawable res = getResources().getDrawable(imageResource);
+                    holder.icon.setImageDrawable(res);
+                } catch (Resources.NotFoundException e) {
+                    holder.icon.setImageResource(R.mipmap.ic_launcher);
+
+                }
             }
             holder.edit.setOnClickListener(new View.OnClickListener() {
                 @Override

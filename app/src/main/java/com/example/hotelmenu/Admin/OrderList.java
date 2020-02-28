@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,11 +42,17 @@ public class OrderList extends AppCompatActivity {
     OrderModel orderModel;
     SQLiteDatabase db;
     OrderListAdapter orderListAdapter;
+    TextView totalPrice;
+    Button checkout;
+    int getTableNo;
+    int total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
+        setContentView(R.layout.activity_checkout);
+        getTableNo = getIntent().getIntExtra("Table_NO", -1);
+        Log.e("Get Table No", String.valueOf(getTableNo));
         projectDatabase = new ProjectDatabase(this);
         orderLists = new ArrayList<>();
 
@@ -52,35 +60,40 @@ public class OrderList extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        setAdapter();
+        orderListAdapter = new OrderListAdapter(this, readOrderList());
+        recyclerView.setAdapter(orderListAdapter);
+//        setAdapter();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(OrderList.this, AddFood.class));
-            }
-        });
+        totalPrice = findViewById(R.id.totalPrice);
+        checkout = findViewById(R.id.confirm);
+        checkout.setVisibility(View.GONE);
+
+
     }
 
     public void setAdapter() {
         orderLists.clear();
-        orderListAdapter = new OrderListAdapter(this, readAllData());
+        orderListAdapter = new OrderListAdapter(this, readOrderList());
         recyclerView.setAdapter(orderListAdapter);
     }
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        setAdapter();
+        //       setAdapter();
     }
 
-    private ArrayList<OrderModel> readAllData() {
+    private ArrayList<OrderModel> readOrderList() {
+        boolean distinct = true;
         db = projectDatabase.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Select " + Constants.cart_col_id + ", " + Constants.cart_col_fName + ", " + Constants.cart_col_category
-                + ", " + Constants.cart_col_price + ", " + Constants.cart_col_image + ", " + Constants.cart_col_qty + ", "
-                + Constants.col_userName + ", " + Constants.col_tableNO + " From " + Constants.order_tableName, new String[]{});
-
+        String selection = Constants.col_tableNO + " = ?";
+        String[] column = {Constants.cart_col_id, Constants.cart_col_fName, Constants.cart_col_category,
+                Constants.cart_col_price, Constants.cart_col_image, Constants.cart_col_qty,
+                Constants.col_userName, Constants.col_tableNO};
+        String[] args = {String.valueOf(getTableNo)};
+        Cursor cursor = db.query(distinct, Constants.order_tableName, column, selection, args,
+                null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(0);
@@ -88,26 +101,45 @@ public class OrderList extends AppCompatActivity {
                 String Category = cursor.getString(2);
                 double Price = cursor.getDouble(3);
                 String Image = cursor.getString(4);
-                int quan = cursor.getInt(5);
-                String custName = cursor.getString(6);
+                int Qty = cursor.getInt(5);
+                String Username = cursor.getString(6);
                 int tableNo = cursor.getInt(7);
 
+                long val = projectDatabase.insertAdminOrder(FoodName, Category, Price, Image, Qty, Username, tableNo);
+                Log.e("Val Added", String.valueOf(val));
+
+                Log.e("Order List", Qty + "- " + Username + " -- " + tableNo);
                 orderModel = new OrderModel();
                 orderModel.setId(id);
                 orderModel.setName(FoodName);
                 orderModel.setCategory(Category);
-                orderModel.setPrice((int) Price);
+                orderModel.setPrice(Price);
                 orderModel.setImg(Image);
-                orderModel.setQty(quan);
-                orderModel.setCustName(custName);
+                orderModel.setQty(Qty);
+                orderModel.setCustName(Username);
                 orderModel.setTableNo(tableNo);
+
+
                 orderLists.add(orderModel);
+                Log.e("OrderLists", orderLists.toString());
+
             } while (cursor.moveToNext());
         }
+
         cursor.close();
         db.close();
 
         return orderLists;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        db = projectDatabase.getWritableDatabase();
+        db.execSQL("delete from " + Constants.adminOrder_tableName);
+        db.close();
+        total = 0;
+        OrderList.this.finish();
 
     }
 
@@ -137,21 +169,27 @@ public class OrderList extends AppCompatActivity {
             final double price = orderModelList.get(position).getPrice();
             final String imageFood = orderModelList.get(position).getImg();
             final String custName = orderModelList.get(position).getCustName();
-            final int table = orderModelList.get(position).getTableNo();
+            //final int table = orderModelList.get(position).getTableNo();
             Log.e("Data", imageFood + "-" + name + price);
 
             holder.foodName.setText(name);
             holder.custName.setText(custName);
             holder.foodCategory.setText(category);
-            holder.tableNo.setText("Table No: " + table);
             holder.foodPrice.setText("Rs. " + String.valueOf(price));
+
+            calculateTotal();
 
             if (imageFood.length() > 0) {
                 String uri = "@drawable/" + imageFood;
                 Log.e("image", uri);
                 int imageResource = getResources().getIdentifier(uri, null, getPackageName());
-                Drawable res = getResources().getDrawable(imageResource);
-                holder.icon.setImageDrawable(res);
+                try {
+                    Drawable res = getResources().getDrawable(imageResource);
+                    holder.icon.setImageDrawable(res);
+                } catch (Resources.NotFoundException e) {
+                    holder.icon.setImageResource(R.mipmap.ic_launcher);
+
+                }
             }
             holder.edit.setVisibility(View.GONE);
 
@@ -169,6 +207,7 @@ public class OrderList extends AppCompatActivity {
                             Toast.makeText(context, "Item has been deleted", Toast.LENGTH_SHORT).show();
                             dialog.cancel();
                             setAdapter();
+                            calculateTotal();
 
                         }
                     });
@@ -192,7 +231,7 @@ public class OrderList extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             ImageView icon, delete, edit;
-            TextView foodName, foodPrice, foodCategory, custName, tableNo;
+            TextView foodName, foodPrice, foodCategory, custName;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -203,9 +242,31 @@ public class OrderList extends AppCompatActivity {
                 delete = itemView.findViewById(R.id.delItem);
                 edit = itemView.findViewById(R.id.editItem);
                 custName = itemView.findViewById(R.id.custName);
-                tableNo = itemView.findViewById(R.id.tablNoo);
+                //tableNo = itemView.findViewById(R.id.tablNoo);
 
             }
+        }
+
+        private void calculateTotal() {
+
+            db = projectDatabase.getReadableDatabase();
+            try {
+                total = 0;
+                Cursor cursorTotal = db.rawQuery("SELECT SUM(" + Constants.adminOrder_col_qty + " * " + Constants.adminOrder_col_price + ") as Total FROM "
+                        + Constants.adminOrder_tableName, null);
+
+                if (cursorTotal.moveToFirst()) {
+                    total = cursorTotal.getInt(cursorTotal.getColumnIndex("Total"));
+                    // Log.e("Total", String.valueOf(total));
+                    totalPrice.setText("Rs. " + total);
+                }
+                cursorTotal.close();
+                db.close();
+            } catch (Exception e) {
+                Log.e("Exception", e.getMessage());
+
+            }
+
         }
     }
 }

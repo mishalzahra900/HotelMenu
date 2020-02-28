@@ -42,7 +42,7 @@ public class AdminDashboard extends AppCompatActivity {
         list_order.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(AdminDashboard.this, OrderList.class));
+                startActivity(new Intent(AdminDashboard.this, ListByTableNo.class));
             }
         });
 

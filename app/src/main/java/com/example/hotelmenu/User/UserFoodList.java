@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
@@ -144,15 +145,17 @@ public class UserFoodList extends AppCompatActivity {
             holder.price.setText(String.valueOf(price));
 
             if (image.length() > 0) {
-                String uri = "@drawable/" + foodList.get(position).getImage();
+                String uri = "@drawable/" + image;
+                Log.e("image", uri);
                 int imageResource = getResources().getIdentifier(uri, null, getPackageName());
-                Drawable res = getResources().getDrawable(imageResource);
-                holder.imageView.setImageDrawable(res);
-            } else {
-                holder.imageView.setImageResource(R.mipmap.ic_launcher);
+                try {
+                    Drawable res = getResources().getDrawable(imageResource);
+                    holder.imageView.setImageDrawable(res);
+                } catch (Resources.NotFoundException e) {
+                    holder.imageView.setImageResource(R.mipmap.ic_launcher);
 
+                }
             }
-
             holder.cart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
