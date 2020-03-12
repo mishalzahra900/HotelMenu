@@ -16,7 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,16 +34,33 @@ import com.example.hotelmenu.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDashboardActivity extends AppCompatActivity {
+public class UserDashboardActivity extends Fragment {
     RecyclerView recyclerView;
     CategoriesAdapter categoriesAdapter;
     TextView textView;
     ProjectDatabase projectDatabase;
     SQLiteDatabase db;
     ArrayList<String> categoryList;
-   // public static String user;
+    // public static String user;
 
+
+    @Nullable
     @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.activity_dashboard, container, false);
+        projectDatabase = new ProjectDatabase(getContext());
+        categoryList = new ArrayList<>();
+
+        recyclerView = root.findViewById(R.id.recyvlerView);
+//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        setAdapter();
+        return root;
+    }
+
+ /*   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
@@ -48,21 +69,13 @@ public class UserDashboardActivity extends AppCompatActivity {
       //  textView = findViewById(R.id.usernameText);
       //  user = getIntent().getStringExtra("Username");
       //  textView.setText("Welcome\n" + user);
-        projectDatabase = new ProjectDatabase(UserDashboardActivity.this);
-        categoryList = new ArrayList<>();
 
-        recyclerView = findViewById(R.id.recyvlerView);
-//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        setAdapter();
 
-    }
+    }*/
 
     public void setAdapter() {
         categoryList.clear();
-        categoriesAdapter = new CategoriesAdapter(UserDashboardActivity.this, readCategories());
+        categoriesAdapter = new CategoriesAdapter(getContext(), readCategories());
         recyclerView.setAdapter(categoriesAdapter);
     }
 
@@ -87,7 +100,7 @@ public class UserDashboardActivity extends AppCompatActivity {
 
     }
 
-    @Override
+   /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.checkout_menu, menu);
@@ -102,15 +115,15 @@ public class UserDashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, Checkout.class));
                 return true;
 
-         /*   case R.id.userLogout:
+         *//*   case R.id.userLogout:
                 startActivity(new Intent(this, MainActivity.class));
                 UserDashboardActivity.this.finish();
                 return true;
-*/
+*//*
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
         private List<String> catList;
@@ -210,9 +223,19 @@ public class UserDashboardActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(context, categ, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(UserDashboardActivity.this, UserFoodList.class);
+                    Fragment fragment = new UserFoodList();
+                    Bundle args = new Bundle();
+                    args.putString("Category", categ);
+                    fragment.setArguments(args);
+
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                   /* Intent intent = new Intent(getContext(), UserFoodList.class);
                     intent.putExtra("Category", categ);
-                    startActivity(intent);
+                    startActivity(intent);*/
                 }
             });
         }

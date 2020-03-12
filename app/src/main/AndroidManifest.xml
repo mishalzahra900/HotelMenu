@@ -12,6 +12,10 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".NavActivity"
+            android:label="@string/title_activity_nav"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".Splash"
             android:theme="@style/NOActionBar">
             <intent-filter>
@@ -28,9 +32,7 @@
         <activity android:name=".Admin.AddFood" />
         <activity android:name=".Admin.AdminDashboard" />
         <activity android:name=".OrderActivty" />
-        <activity android:name=".User.UserDashboardActivity">
-
-        </activity>
+        <activity android:name=".User.UserDashboardActivity" />
         <activity android:name=".RegisterActivity" />
         <activity
             android:name=".LoginActivity"
@@ -41,11 +43,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
-
-        </activity>
-
-        <activity android:name=".Admin.ListByTableNo"/>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".Admin.ListByTableNo" />
     </application>
 
 </manifest>

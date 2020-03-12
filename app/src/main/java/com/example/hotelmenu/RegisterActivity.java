@@ -42,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
       //  String regexPassword = "(?=.*[a-z])(?=.*[A-Z])(?=.*[\\d])(?=.*[~`!@#\\$%\\^&\\*\\(\\)\\-_\\+=\\{\\}\\[\\]\\|\\;:\"<>,./\\?]).{8,}";
        //awesomeValidation.addValidation(this, R.id.password, regexPassword, R.string.passwordError);
 
-      /*  register.setOnClickListener(new View.OnClickListener() {
+        /*register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {

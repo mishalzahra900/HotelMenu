@@ -1,7 +1,9 @@
 package com.example.hotelmenu.User;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,9 +35,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.hotelmenu.Constants.food_tableName;
 
-public class UserFoodList extends AppCompatActivity {
+public class UserFoodList extends Fragment {
     RecyclerView recyclerView;
     UserFoodListAdapter userFoodListAdapter;
     TextView textView;
@@ -45,27 +46,35 @@ public class UserFoodList extends AppCompatActivity {
     String getCat;
     FoodModel foodModel;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
-        getCat = getIntent().getStringExtra("Category");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.activity_list, container, false);
+        //getCat = getActivity().getIntent().getStringExtra("Category");
+        getCat = getArguments().getString("Category");
+        recyclerView = root.findViewById(R.id.recyvlerView);
 
-        recyclerView = findViewById(R.id.recyvlerView);
-
-        projectDatabase = new ProjectDatabase(UserFoodList.this);
+        projectDatabase = new ProjectDatabase(getContext());
         foodList = new ArrayList<>();
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setVisibility(View.GONE);
+        /*FloatingActionButton fab = root.findViewById(R.id.fab);
+        fab.setVisibility(View.GONE);*/
 
-        recyclerView = findViewById(R.id.recyvlerView);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView = root.findViewById(R.id.recyvlerView);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        userFoodListAdapter = new UserFoodListAdapter(UserFoodList.this, readFoodList());
+        userFoodListAdapter = new UserFoodListAdapter(getContext(), readFoodList());
         recyclerView.setAdapter(userFoodListAdapter);
+        return root;
     }
 
+    /* @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_list);
+
+     }
+ */
     private ArrayList<FoodModel> readFoodList() {
         boolean distinct = true;
         db = projectDatabase.getReadableDatabase();
@@ -80,7 +89,7 @@ public class UserFoodList extends AppCompatActivity {
                 String Image = cursor.getString(2);
                 Log.e("Food List", FoodName + "- " + Price);
 
-                foodModel = new FoodModel(this);
+                foodModel = new FoodModel(getContext());
                 foodModel.setFoodName(FoodName);
                 foodModel.setPrice((int) Price);
                 foodModel.setImage(Image);
@@ -96,7 +105,7 @@ public class UserFoodList extends AppCompatActivity {
         return foodList;
     }
 
-    @Override
+   /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.checkout_menu, menu);
@@ -114,7 +123,7 @@ public class UserFoodList extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     public class UserFoodListAdapter extends RecyclerView.Adapter<UserFoodListAdapter.ViewHolder> {
         private List<FoodModel> foodList;
@@ -147,7 +156,7 @@ public class UserFoodList extends AppCompatActivity {
             if (image.length() > 0) {
                 String uri = "@drawable/" + image;
                 Log.e("image", uri);
-                int imageResource = getResources().getIdentifier(uri, null, getPackageName());
+                int imageResource = getResources().getIdentifier(uri, null, getContext().getPackageName());
                 try {
                     Drawable res = getResources().getDrawable(imageResource);
                     holder.imageView.setImageDrawable(res);
@@ -169,9 +178,9 @@ public class UserFoodList extends AppCompatActivity {
 
                         long res = projectDatabase.insertCart(cart.getName(), cart.getCategory(), cart.getPrice(), cart.getImg(), cart.getQty());
                         if (res > 0) {
-                            Toast.makeText(UserFoodList.this, "Food Item Added to your Cart", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Food Item Added to your Cart", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(UserFoodList.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Something Went Wrong", Toast.LENGTH_SHORT).show();
 
                         }
                     } catch (Exception e) {
